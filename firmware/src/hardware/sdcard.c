@@ -1,3 +1,5 @@
+#if 0
+
 /*------------------------------------------------------------------------/
 /  Bitbanging MMCv3/SDv1/SDv2 (in SPI mode) control module for PFF
 /-------------------------------------------------------------------------/
@@ -382,4 +384,6 @@ DRESULT disk_writep (
 
 	return res;
 }
+#endif
+
 #endif
