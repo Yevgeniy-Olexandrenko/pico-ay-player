@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// I2C Bus
+// ATmega328p I2C Bus
 // -----------------------------------------------------------------------------
 
 #ifndef _I2C_H_
@@ -7,10 +7,10 @@
 
 #include "../../arduino.h"
 
-#define I2C_DDR DDRB
-#define I2C_PIN PINB
-#define I2C_SDA PB0
-#define I2C_SCL PB2
+#define I2C_DDR DDRB    // TODO
+#define I2C_PIN PINB    // TODO
+#define I2C_SDA PB0     // TODO
+#define I2C_SCL PB2     // TODO
 
 bool    i2c_start_write(uint8_t addr);
 bool    i2c_start_read(uint8_t addr);

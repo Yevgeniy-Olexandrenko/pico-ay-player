@@ -1,8 +1,8 @@
 // -----------------------------------------------------------------------------
-// I2C Bus
+// ATmega328p I2C Bus
 // -----------------------------------------------------------------------------
 
-#include "i2c.h"
+#include "atmega328p_i2c.h"
 
 #define i2c_sda_release()  clr_bit(I2C_DDR, I2C_SDA)
 #define i2c_sda_pulldown() set_bit(I2C_DDR, I2C_SDA)

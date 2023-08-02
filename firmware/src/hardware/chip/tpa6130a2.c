@@ -3,7 +3,7 @@
 // -----------------------------------------------------------------------------
 
 #include "tpa6130a2.h"
-#include "../mcu/i2c.h"
+#include "atmega328p_i2c.h"
 
 #define TPA6130A2_I2C_ADDR    0x60
 #define TPA6130A2_VOL_LEVELS  64

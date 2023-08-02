@@ -1,8 +1,12 @@
 // -----------------------------------------------------------------------------
-// 23LC512 Chip (32 Kb SRAM)
+// ATmega328p Timers
 // -----------------------------------------------------------------------------
 
-#include "23lc512.h"
-#include "atmega328p_spi.h"
+#ifndef _TIMERS_H_
+#define _TIMERS_H_
+
+#include "../../arduino.h"
 
 // TODO
+
+#endif // _TIMERS_H_
