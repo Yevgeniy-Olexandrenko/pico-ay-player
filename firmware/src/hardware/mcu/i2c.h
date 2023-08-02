@@ -5,6 +5,8 @@
 #ifndef _I2C_H_
 #define _I2C_H_
 
+#include "../../arduino.h"
+
 #define I2C_DDR DDRB
 #define I2C_PIN PINB
 #define I2C_SDA PB0

@@ -3,7 +3,6 @@
 // -----------------------------------------------------------------------------
 
 #include "i2c.h"
-#include "src/libraries/commons.h"
 
 #define i2c_sda_release()  clr_bit(I2C_DDR, I2C_SDA)
 #define i2c_sda_pulldown() set_bit(I2C_DDR, I2C_SDA)
@@ -11,7 +10,7 @@
 #define i2c_scl_release()  clr_bit(I2C_DDR, I2C_SCL)
 #define i2c_scl_pulldown() set_bit(I2C_DDR, I2C_SCL)
 #define i2c_scl_read()     isb_set(I2C_PIN, I2C_SCL)
-#define i2c_delay()     __asm__ __volatile__ ("nop")
+#define i2c_delay()        __asm__ __volatile__ ("nop")
 
 // -----------------------------------------------------------------------------
 
@@ -21,12 +20,14 @@ static void i2c_scl_release_wait()
     while (!i2c_scl_read());
 }
 
-static i2c_read_write(uint8_t data)
+static uint8_t i2c_read_write(uint8_t data)
 {
     for (uint8_t sda, i = 8; i > 0; --i)
     {
-        i2c_sda_release();
-        if (!(data & 0x80)) i2c_sda_pulldown();
+        if (data & 0x80)
+            i2c_sda_release();
+        else
+            i2c_sda_pulldown();
         i2c_scl_release_wait();
 
         sda = i2c_sda_read();

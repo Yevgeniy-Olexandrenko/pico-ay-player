@@ -3,7 +3,7 @@
 // -----------------------------------------------------------------------------
 
 #include "tpa6130a2.h"
-#include "src/hardware/mcu/i2c.h"
+#include "../mcu/i2c.h"
 
 #define TPA6130A2_I2C_ADDR    0x60
 #define TPA6130A2_VOL_LEVELS  64
@@ -19,6 +19,8 @@ typedef enum {
 #define TPA6130A2_BIT_HP_EN_L 7 // control
 #define TPA6130A2_BIT_MUTE_R  6 // volume & mute
 #define TPA6130A2_BIT_MUTE_L  7 // volume & mute
+
+// -----------------------------------------------------------------------------
 
 static uint8_t tpa6130a2_get_register(TPA6130A2_REG reg)
 {
@@ -53,26 +55,26 @@ bool tpa6130a2_init()
 
 void tpa6130a2_set_volume(uint8_t volume)
 {
-    if (volume >= TPA6130A2_VOL_LEVELS) 
+    if (volume >= TPA6130A2_VOL_LEVELS)
         volume = (TPA6130A2_VOL_LEVELS - 1);
     uint8_t data = tpa6130a2_get_register(TPA6130A2_VOLUME_MUTE);
-    set_bit(volume, TPA6130A2_BIT_MUTE_R, isb_set(data, TPA6130A2_BIT_MUTE_R));
-    set_bit(volume, TPA6130A2_BIT_MUTE_L, isb_set(data, TPA6130A2_BIT_MUTE_L));
+    upd_bit(volume, TPA6130A2_BIT_MUTE_R, isb_set(data, TPA6130A2_BIT_MUTE_R));
+    upd_bit(volume, TPA6130A2_BIT_MUTE_L, isb_set(data, TPA6130A2_BIT_MUTE_L));
     tpa6130a2_set_register(TPA6130A2_VOLUME_MUTE, volume);
 }
 
 void tpa6130a2_set_mute(bool yes)
 {
     uint8_t data = tpa6130a2_get_register(TPA6130A2_VOLUME_MUTE);
-    set_bit(data, TPA6130A2_BIT_MUTE_R, yes);
-    set_bit(data, TPA6130A2_BIT_MUTE_L, yes);
+    upd_bit(data, TPA6130A2_BIT_MUTE_R, yes);
+    upd_bit(data, TPA6130A2_BIT_MUTE_L, yes);
     tpa6130a2_set_register(TPA6130A2_VOLUME_MUTE, data);
 }
 
 void tpa6130a2_set_shutdown(bool yes)
 {
     uint8_t data = tpa6130a2_get_register(TPA6130A2_CONTROL);
-    set_bit(data, TPA6130A2_BIT_SWS, yes);
+    upd_bit(data, TPA6130A2_BIT_SWS, yes);
     tpa6130a2_set_register(TPA6130A2_CONTROL, data);
 }
 
