@@ -27,7 +27,13 @@ static uint8_t tpa6130a2_get_register(TPA6130A2_REG reg)
     i2c_start_write(TPA6130A2_I2C_ADDR);
     i2c_write(reg);
     i2c_start_read(TPA6130A2_I2C_ADDR);
-    return i2c_read_ack();
+    return i2c_read_nack();
+}
+
+static uint8_t tpa6130a2_get_register_and_stop(TPA6130A2_REG reg)
+{
+    uint8_t data = tpa6130a2_get_register(reg);
+    i2c_stop(); return data;
 }
 
 static void tpa6130a2_set_register(TPA6130A2_REG reg, uint8_t data)
@@ -48,8 +54,7 @@ bool tpa6130a2_init()
     set_bit(data1, TPA6130A2_BIT_HP_EN_L);
     tpa6130a2_set_register(TPA6130A2_CONTROL, data1);
     tpa6130a2_set_register(TPA6130A2_VOLUME_MUTE, data2);
-    uint8_t data4 = tpa6130a2_get_register(TPA6130A2_VERSION);
-    i2c_stop();
+    uint8_t data4 = tpa6130a2_get_register_and_stop(TPA6130A2_VERSION);
     return (data4 == 0x02);
 }
 
@@ -78,23 +83,22 @@ void tpa6130a2_set_shutdown(bool yes)
     tpa6130a2_set_register(TPA6130A2_CONTROL, data);
 }
 
+// -----------------------------------------------------------------------------
+
 uint8_t tpa6130a2_get_volume()
 {
-    uint8_t data = tpa6130a2_get_register(TPA6130A2_VOLUME_MUTE);
-    i2c_stop();
+    uint8_t data = tpa6130a2_get_register_and_stop(TPA6130A2_VOLUME_MUTE);
     return (data & (TPA6130A2_VOL_LEVELS - 1));
 }
 
 bool tpa6130a2_get_mute()
 {
-    uint8_t data = tpa6130a2_get_register(TPA6130A2_VOLUME_MUTE);
-    i2c_stop();
+    uint8_t data = tpa6130a2_get_register_and_stop(TPA6130A2_VOLUME_MUTE);
     return (isb_set(data, TPA6130A2_BIT_MUTE_R) && isb_set(data, TPA6130A2_BIT_MUTE_L));
 }
 
 bool tpa6130a2_get_shutdown()
 {
-    uint8_t data = tpa6130a2_get_register(TPA6130A2_CONTROL);
-    i2c_stop();
+    uint8_t data = tpa6130a2_get_register_and_stop(TPA6130A2_CONTROL);
     return isb_set(data, TPA6130A2_BIT_SWS);
 }

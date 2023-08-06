@@ -7,10 +7,10 @@
 
 #include "../../arduino.h"
 
-#define I2C_DDR DDRB    // TODO
-#define I2C_PIN PINB    // TODO
-#define I2C_SDA PB0     // TODO
-#define I2C_SCL PB2     // TODO
+#define I2C_DDR DDRC
+#define I2C_PIN PINC
+#define I2C_SDA PC4
+#define I2C_SCL PC5
 
 bool    i2c_start_write(uint8_t addr);
 bool    i2c_start_read(uint8_t addr);
