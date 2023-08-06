@@ -20,7 +20,7 @@ static void i2c_scl_release_wait()
     while (!i2c_scl_read());
 }
 
-static uint8_t i2c_read_write(uint8_t data)
+static uint8_t i2c_transfer(uint8_t data)
 {
     for (uint8_t sda, i = 8; i > 0; --i)
     {
@@ -74,7 +74,7 @@ uint8_t i2c_read_nack()
 
 uint8_t i2c_read(bool ack)
 {
-    uint8_t data = i2c_read_write(0xFF);
+    uint8_t data = i2c_transfer(0xFF);
     if (ack) i2c_sda_pulldown();
     i2c_scl_release_wait();
 
@@ -85,7 +85,7 @@ uint8_t i2c_read(bool ack)
 
 bool i2c_write(uint8_t data)
 {
-    i2c_read_write(data);
+    i2c_transfer(data);
     i2c_scl_release_wait();
 
     bool ack = !i2c_sda_read();

@@ -13,6 +13,7 @@
 #define SPI_MOSI PB3
 
 void    spi_init();
-uint8_t spi_transfer(uint8_t data);
+void    spi_write(uint8_t data);
+uint8_t spi_read();
 
 #endif // _SPI_H_
