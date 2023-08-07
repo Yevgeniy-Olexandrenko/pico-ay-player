@@ -22,7 +22,7 @@ typedef enum {
 
 static void sram_start()
 {
-    spi_start(SPI_SPEED_FULL, SPI_MSB_FIRST, SPI_MODE0);
+    spi_start(SPI_PRESCALE2, SPI_MSB_FIRST, SPI_MODE0);
     clr_bit(SRAM_PORT, SRAM_CS); // chip select
 }
 
