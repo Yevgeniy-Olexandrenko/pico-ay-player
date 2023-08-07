@@ -14,10 +14,10 @@
 
 bool    i2c_start_write(uint8_t addr);
 bool    i2c_start_read(uint8_t addr);
+bool    i2c_write(uint8_t data);
 uint8_t i2c_read_ack();
 uint8_t i2c_read_nack();
 uint8_t i2c_read(bool ack);
-bool    i2c_write(uint8_t data);
 void    i2c_stop();
 
 #endif // _I2C_H_

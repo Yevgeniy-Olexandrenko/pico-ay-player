@@ -22,19 +22,18 @@ typedef enum {
 
 static void sram_start()
 {
-    // TODO: spi start
-    clr_bit(SRAM_PORT, SRAM_SS); // select
+    spi_start(SPI_SPEED_FULL, SPI_MSB_FIRST, SPI_MODE0);
+    clr_bit(SRAM_PORT, SRAM_CS); // chip select
 }
 
 static void sram_stop()
 {
-    set_bit(SRAM_PORT, SRAM_SS); // deselect
-    // TODO: spi stop
+    set_bit(SRAM_PORT, SRAM_CS); // chip deselect
+    spi_stop();
 }
 
-static void sram_start(SRAM_MODE mode, SRAM_INST inst, uint16_t addr)
+static void sram_start(SRAM_INST inst, uint16_t addr)
 {
-    sram_write_status(mode);
     sram_start();
     spi_write(inst);
     spi_write(addr >> 8);
@@ -45,59 +44,44 @@ static void sram_start(SRAM_MODE mode, SRAM_INST inst, uint16_t addr)
 
 void sram_init()
 {
-    // TODO: spi
-    set_bit(SRAM_DDR, SRAM_SS);
+    set_bit(SRAM_DDR, SRAM_CS); // chip select as output
+    sram_start();
+    spi_write(SRAM_WRSR);
+    spi_write(SRAM_SEQ);        // default mode
     sram_stop();
 }
 
 void sram_fill(uint16_t addr, uint8_t data, uint16_t size)
 {
-    sram_start(SRAM_SEQUENTIAL, SRAM_WRITE, addr);
-    for (uint16_t i = 0; i < size; ++i) spi_write(data);
+    sram_start(SRAM_WRITE, addr);
+    for (; size > 0; --size) spi_write(data);
     sram_stop();
 }
 
-void sram_write_status(uint8_t data)
+void sram_write(uint16_t addr, uint8_t* data, uint16_t size)
 {
-    sram_start();
-    spi_write(SRAM_WRSR);
-    spi_write(data);
+    sram_start(SRAM_WRITE, addr);
+    for (; size > 0; ++data, --size) spi_write(*data);
     sram_stop();
 }
 
-uint8_t sram_read_status()
+void sram_read(uint16_t addr, uint8_t* data, uint16_t size)
 {
-    sram_start();
-    spi_write(SRAM_RDSR);
-    uint8_t data = spi_read();
-    sram_stop();
-    return data;
-}
-
-void sram_write_block(uint16_t addr, uint8_t* data, uint16_t size)
-{
-    sram_start(SRAM_SEQUENTIAL, SRAM_WRITE, addr);
-    for (uint16_t i = 0; i < size; ++i) spi_write(data[i]);
-    sram_stop();
-}
-
-void sram_read_block(uint16_t addr, uint8_t* data, uint16_t size)
-{
-    sram_start(SRAM_SEQUENTIAL, SRAM_READ, addr);
-    for (uint16_t i = 0; i < size; ++i) data[i] = spi_read();
+    sram_start(SRAM_READ, addr);
+    for (; size > 0; ++data, --size) *data = spi_read();
     sram_stop();
 }
 
 void sram_write(uint16_t addr, uint8_t data)
 {
-    sram_start(SRAM_BYTE, SRAM_WRITE, addr);
+    sram_start(SRAM_WRITE, addr);
     spi_write(data);
     sram_stop();
 }
 
 void sram_read(uint16_t addr)
 {
-    sram_start(SRAM_BYTE, SRAM_READ, addr);
+    sram_start(SRAM_READ, addr);
     uint8_t data = spi_read();
     sram_stop();
     return data;
@@ -105,24 +89,24 @@ void sram_read(uint16_t addr)
 
 void sram_write16(uint16_t addr, uint16_t data)
 {
-    sram_write_block(addr, &data, 2);
+    sram_write(addr, &data, 2);
 }
 
 uint16_t sram_read16(uint16_t addr)
 {
     uint16_t data;
-    sram_read_block(addr, &data, 2);
+    sram_read(addr, &data, 2);
     return data;
 }
 
 void sram_write32(uint16_t addr, uint32_t data)
 {
-    sram_write_block(addr, &data, 4);
+    sram_write(addr, &data, 4);
 }
 
 uint32_t sram_read32(uint16_t addr)
 {
     uint32_t data;
-    sram_read_block(addr, &data, 4);
+    sram_read(addr, &data, 4);
     return data;
 }

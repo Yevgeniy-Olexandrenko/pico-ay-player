@@ -62,6 +62,16 @@ bool i2c_start_read(uint8_t addr)
     return i2c_write(addr << 1 | 1);
 }
 
+bool i2c_write(uint8_t data)
+{
+    i2c_transfer(data);
+    i2c_scl_release_wait();
+
+    bool ack = !i2c_sda_read();
+    i2c_scl_pulldown();
+    return ack;
+}
+
 uint8_t i2c_read_ack()
 {
     return i2c_read(true);
@@ -81,16 +91,6 @@ uint8_t i2c_read(bool ack)
     i2c_delay();
     i2c_scl_pulldown();
     return data;
-}
-
-bool i2c_write(uint8_t data)
-{
-    i2c_transfer(data);
-    i2c_scl_release_wait();
-
-    bool ack = !i2c_sda_read();
-    i2c_scl_pulldown();
-    return ack;
 }
 
 void i2c_stop()
