@@ -32,7 +32,7 @@ static void sram_stop()
     spi_stop();
 }
 
-static void sram_start(SRAM_INST inst, uint16_t addr)
+static void sram_inst_addr(SRAM_INST inst, uint16_t addr)
 {
     sram_start();
     spi_write(inst);
@@ -51,37 +51,37 @@ void sram_init()
     sram_stop();
 }
 
-void sram_fill(uint16_t addr, uint8_t data, uint16_t size)
+void sram_fill_block(uint16_t addr, uint8_t data, uint16_t size)
 {
-    sram_start(SRAM_WRITE, addr);
+    sram_inst_addr(SRAM_WRITE, addr);
     for (; size > 0; --size) spi_write(data);
     sram_stop();
 }
 
-void sram_write(uint16_t addr, uint8_t* data, uint16_t size)
+void sram_write_block(uint16_t addr, uint8_t* data, uint16_t size)
 {
-    sram_start(SRAM_WRITE, addr);
+    sram_inst_addr(SRAM_WRITE, addr);
     for (; size > 0; ++data, --size) spi_write(*data);
     sram_stop();
 }
 
-void sram_read(uint16_t addr, uint8_t* data, uint16_t size)
+void sram_read_block(uint16_t addr, uint8_t* data, uint16_t size)
 {
-    sram_start(SRAM_READ, addr);
+    sram_inst_addr(SRAM_READ, addr);
     for (; size > 0; ++data, --size) *data = spi_read();
     sram_stop();
 }
 
 void sram_write(uint16_t addr, uint8_t data)
 {
-    sram_start(SRAM_WRITE, addr);
+    sram_inst_addr(SRAM_WRITE, addr);
     spi_write(data);
     sram_stop();
 }
 
-void sram_read(uint16_t addr)
+uint8_t sram_read(uint16_t addr)
 {
-    sram_start(SRAM_READ, addr);
+    sram_inst_addr(SRAM_READ, addr);
     uint8_t data = spi_read();
     sram_stop();
     return data;
@@ -89,24 +89,24 @@ void sram_read(uint16_t addr)
 
 void sram_write16(uint16_t addr, uint16_t data)
 {
-    sram_write(addr, &data, 2);
+    sram_write_block(addr, &data, 2);
 }
 
 uint16_t sram_read16(uint16_t addr)
 {
     uint16_t data;
-    sram_read(addr, &data, 2);
+    sram_read_block(addr, &data, 2);
     return data;
 }
 
 void sram_write32(uint16_t addr, uint32_t data)
 {
-    sram_write(addr, &data, 4);
+    sram_write_block(addr, &data, 4);
 }
 
 uint32_t sram_read32(uint16_t addr)
 {
     uint32_t data;
-    sram_read(addr, &data, 4);
+    sram_read_block(addr, &data, 4);
     return data;
 }

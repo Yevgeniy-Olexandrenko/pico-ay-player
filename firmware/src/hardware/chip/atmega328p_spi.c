@@ -13,7 +13,7 @@ static uint8_t spi_transfer(uint8_t data)
 
 // -----------------------------------------------------------------------------
 
-void spi_start(SPI_SPEED speed, SPI_ORDER order, SPI_MODE mode);
+void spi_start(SPI_SPEED speed, SPI_ORDER order, SPI_MODE mode)
 {
     res_bit(SPI_DDR, SPI_MISO); // MISO as input
     set_bit(SPI_DDR, SPI_MOSI); // MOSI as output
