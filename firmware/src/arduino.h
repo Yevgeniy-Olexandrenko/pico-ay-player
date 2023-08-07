@@ -15,7 +15,7 @@
         if (val)               \
             set_bit(sfr, bit); \
         else                   \
-            res_bit(sfr, bit); \
+            clr_bit(sfr, bit); \
     }
 
 // TODO

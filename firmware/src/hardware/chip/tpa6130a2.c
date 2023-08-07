@@ -1,44 +1,44 @@
 // -----------------------------------------------------------------------------
-// TPA6130A2 Chip
+// TPA6130A2 Chip (Headphone Amplifier)                                completed
 // -----------------------------------------------------------------------------
 
 #include "tpa6130a2.h"
 #include "atmega328p_i2c.h"
 
-#define TPA6130A2_I2C_ADDR    0x60
-#define TPA6130A2_VOL_LEVELS  64
+#define AMP_I2C_ADDR    0x60
+#define AMP_VOL_LEVELS  64
 
 typedef enum {
-    TPA6130A2_CONTROL         = 0x01,
-    TPA6130A2_VOLUME_MUTE     = 0x02,
-    TPA6130A2_VERSION         = 0x04
-} TPA6130A2_REG;
+    AMP_REG_CONTROL   = 0x01,
+    AMP_REG_VOL_MUTE  = 0x02,
+    AMP_REG_VERSION   = 0x04
+} AMP_REG;
 
-#define TPA6130A2_BIT_SWS     0 // control
-#define TPA6130A2_BIT_HP_EN_R 6 // control
-#define TPA6130A2_BIT_HP_EN_L 7 // control
-#define TPA6130A2_BIT_MUTE_R  6 // volume & mute
-#define TPA6130A2_BIT_MUTE_L  7 // volume & mute
+#define AMP_BIT_SWS     0 // control
+#define AMP_BIT_HP_EN_R 6 // control
+#define AMP_BIT_HP_EN_L 7 // control
+#define AMP_BIT_MUTE_R  6 // volume & mute
+#define AMP_BIT_MUTE_L  7 // volume & mute
 
 // -----------------------------------------------------------------------------
 
-static uint8_t tpa6130a2_get_register(TPA6130A2_REG reg)
+static uint8_t amp_get_register(AMP_REG reg)
 {
-    i2c_start_write(TPA6130A2_I2C_ADDR);
+    i2c_start_write(AMP_I2C_ADDR);
     i2c_write(reg);
-    i2c_start_read(TPA6130A2_I2C_ADDR);
+    i2c_start_read(AMP_I2C_ADDR);
     return i2c_read_nack();
 }
 
-static uint8_t tpa6130a2_get_register_and_stop(TPA6130A2_REG reg)
+static uint8_t amp_get_register_and_stop(AMP_REG reg)
 {
-    uint8_t data = tpa6130a2_get_register(reg);
+    uint8_t data = amp_get_register(reg);
     i2c_stop(); return data;
 }
 
-static void tpa6130a2_set_register(TPA6130A2_REG reg, uint8_t data)
+static void amp_set_register(AMP_REG reg, uint8_t data)
 {
-    i2c_start_write(TPA6130A2_I2C_ADDR);
+    i2c_start_write(AMP_I2C_ADDR);
     i2c_write(reg);
     i2c_write(data);
     i2c_stop();
@@ -46,59 +46,57 @@ static void tpa6130a2_set_register(TPA6130A2_REG reg, uint8_t data)
 
 // -----------------------------------------------------------------------------
 
-bool tpa6130a2_init()
+bool amp_init()
 {
     uint8_t data1 = 0x00;
-    uint8_t data2 = ((TPA6130A2_VOL_LEVELS / 2) - 1);
-    set_bit(data1, TPA6130A2_BIT_HP_EN_R);
-    set_bit(data1, TPA6130A2_BIT_HP_EN_L);
-    tpa6130a2_set_register(TPA6130A2_CONTROL, data1);
-    tpa6130a2_set_register(TPA6130A2_VOLUME_MUTE, data2);
-    uint8_t data4 = tpa6130a2_get_register_and_stop(TPA6130A2_VERSION);
+    uint8_t data2 = ((AMP_VOL_LEVELS / 2) - 1);
+    set_bit(data1, AMP_BIT_HP_EN_R);
+    set_bit(data1, AMP_BIT_HP_EN_L);
+    amp_set_register(AMP_REG_CONTROL, data1);
+    amp_set_register(AMP_REG_VOL_MUTE, data2);
+    uint8_t data4 = amp_get_register_and_stop(AMP_REG_VERSION);
     return (data4 == 0x02);
 }
 
-void tpa6130a2_set_volume(uint8_t volume)
+void amp_set_volume(uint8_t volume)
 {
-    if (volume >= TPA6130A2_VOL_LEVELS)
-        volume = (TPA6130A2_VOL_LEVELS - 1);
-    uint8_t data = tpa6130a2_get_register(TPA6130A2_VOLUME_MUTE);
-    upd_bit(volume, TPA6130A2_BIT_MUTE_R, isb_set(data, TPA6130A2_BIT_MUTE_R));
-    upd_bit(volume, TPA6130A2_BIT_MUTE_L, isb_set(data, TPA6130A2_BIT_MUTE_L));
-    tpa6130a2_set_register(TPA6130A2_VOLUME_MUTE, volume);
+    if (volume >= AMP_VOL_LEVELS)
+        volume = (AMP_VOL_LEVELS - 1);
+    uint8_t data = amp_get_register(AMP_REG_VOL_MUTE);
+    upd_bit(volume, AMP_BIT_MUTE_R, isb_set(data, AMP_BIT_MUTE_R));
+    upd_bit(volume, AMP_BIT_MUTE_L, isb_set(data, AMP_BIT_MUTE_L));
+    amp_set_register(AMP_REG_VOL_MUTE, volume);
 }
 
-void tpa6130a2_set_mute(bool yes)
+void amp_set_mute(bool yes)
 {
-    uint8_t data = tpa6130a2_get_register(TPA6130A2_VOLUME_MUTE);
-    upd_bit(data, TPA6130A2_BIT_MUTE_R, yes);
-    upd_bit(data, TPA6130A2_BIT_MUTE_L, yes);
-    tpa6130a2_set_register(TPA6130A2_VOLUME_MUTE, data);
+    uint8_t data = amp_get_register(AMP_REG_VOL_MUTE);
+    upd_bit(data, AMP_BIT_MUTE_R, yes);
+    upd_bit(data, AMP_BIT_MUTE_L, yes);
+    amp_set_register(AMP_REG_VOL_MUTE, data);
 }
 
-void tpa6130a2_set_shutdown(bool yes)
+void amp_set_shutdown(bool yes)
 {
-    uint8_t data = tpa6130a2_get_register(TPA6130A2_CONTROL);
-    upd_bit(data, TPA6130A2_BIT_SWS, yes);
-    tpa6130a2_set_register(TPA6130A2_CONTROL, data);
+    uint8_t data = amp_get_register(AMP_REG_CONTROL);
+    upd_bit(data, AMP_BIT_SWS, yes);
+    amp_set_register(AMP_REG_CONTROL, data);
 }
 
-// -----------------------------------------------------------------------------
-
-uint8_t tpa6130a2_get_volume()
+uint8_t amp_get_volume()
 {
-    uint8_t data = tpa6130a2_get_register_and_stop(TPA6130A2_VOLUME_MUTE);
-    return (data & (TPA6130A2_VOL_LEVELS - 1));
+    uint8_t data = amp_get_register_and_stop(AMP_REG_VOL_MUTE);
+    return (data & (AMP_VOL_LEVELS - 1));
 }
 
-bool tpa6130a2_get_mute()
+bool amp_get_mute()
 {
-    uint8_t data = tpa6130a2_get_register_and_stop(TPA6130A2_VOLUME_MUTE);
-    return (isb_set(data, TPA6130A2_BIT_MUTE_R) && isb_set(data, TPA6130A2_BIT_MUTE_L));
+    uint8_t data = amp_get_register_and_stop(AMP_REG_VOL_MUTE);
+    return (isb_set(data, AMP_BIT_MUTE_R) && isb_set(data, AMP_BIT_MUTE_L));
 }
 
-bool tpa6130a2_get_shutdown()
+bool amp_get_shutdown()
 {
-    uint8_t data = tpa6130a2_get_register_and_stop(TPA6130A2_CONTROL);
-    return isb_set(data, TPA6130A2_BIT_SWS);
+    uint8_t data = amp_get_register_and_stop(AMP_REG_CONTROL);
+    return isb_set(data, AMP_BIT_SWS);
 }

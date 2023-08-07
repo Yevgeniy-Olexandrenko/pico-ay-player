@@ -15,7 +15,7 @@ static uint8_t spi_transfer(uint8_t data)
 
 void spi_start(SPI_PRESCALE prescale, SPI_ORDER order, SPI_MODE mode)
 {
-    res_bit(SPI_DDR, SPI_MISO); // MISO as input
+    clr_bit(SPI_DDR, SPI_MISO); // MISO as input
     set_bit(SPI_DDR, SPI_MOSI); // MOSI as output
     set_bit(SPI_DDR, SPI_SCK ); // SCK  as output
 
@@ -37,5 +37,5 @@ uint8_t spi_read()
 
 void spi_stop()
 {
-    res_bit(SPCR, SPE);
+    clr_bit(SPCR, SPE);
 }
