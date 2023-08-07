@@ -1,17 +1,8 @@
 // -----------------------------------------------------------------------------
-// ATmega328p SPI Bus
+// ATmega328p SPI Bus                                                  completed
 // -----------------------------------------------------------------------------
 
 #include "atmega328p_spi.h"
-
-static uint8_t spi_transfer(uint8_t data)
-{
-    SPDR = data;
-    while (isb_clr(SPSR, SPIF));
-    return SPDR;
-}
-
-// -----------------------------------------------------------------------------
 
 void spi_start(SPI_PRESCALE prescale, SPI_ORDER order, SPI_MODE mode)
 {
@@ -25,6 +16,13 @@ void spi_start(SPI_PRESCALE prescale, SPI_ORDER order, SPI_MODE mode)
     upd_bit(SPCR, SPR0,  prescale & 0b001);
 }
 
+uint8_t spi_transfer(uint8_t data)
+{
+    SPDR = data;
+    while (isb_clr(SPSR, SPIF));
+    return SPDR;
+}
+
 void spi_write(uint8_t data)
 {
     spi_transfer(data);
@@ -32,7 +30,7 @@ void spi_write(uint8_t data)
 
 uint8_t spi_read() 
 {
-    return spi_transfer(0x00);
+    return spi_transfer(0);
 }
 
 void spi_stop()

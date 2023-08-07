@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// ATmega328p SPI Bus
+// ATmega328p SPI Bus                                                  completed
 // -----------------------------------------------------------------------------
 
 #ifndef _SPI_H_
@@ -35,9 +35,10 @@ typedef enum {
     SPI_MODE3 = _BV(CPHA) | _BV(CPOL)
 } SPI_MODE;
 
-void    spi_start(SPI_PRESCALE prescale, SPI_ORDER order, SPI_MODE mode);
-void    spi_write(uint8_t data);
-uint8_t spi_read();
-void    spi_stop();
+void    spi_start    (SPI_PRESCALE prescale, SPI_ORDER order, SPI_MODE mode);
+uint8_t spi_transfer (uint8_t data);
+void    spi_write    (uint8_t data);
+uint8_t spi_read     ();
+void    spi_stop     ();
 
 #endif // _SPI_H_
